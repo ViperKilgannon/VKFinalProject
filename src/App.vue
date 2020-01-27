@@ -1,185 +1,73 @@
 <template>
-  <v-app light>
+  <v-app id="inspire">
+    <!-- This is the nav bar code -->
+    <v-app-bar app clipped-right color="#5AC161" dark>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-toolbar-title>Duck Notes</v-toolbar-title>
+      <v-spacer />
+      <!-- todo dynamic lable to login/register, show user when logged in, have logout attached -->
+      <v-label>Login</v-label>
+      <img src="./assets/ducknotes.png" width="35px" height="55px" style="margin-left: 5px" />
+    </v-app-bar>
+
+    <!-- This is the Menu Drawer to have list of notes and select groups -->
+    <v-navigation-drawer v-model="drawer" color="#50E6C4" app>
+      <v-list dense>
+        <v-list-item @click.stop="left = !left">
+          <v-list-item-action>
+            <v-icon>mdi-exit-to-app</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Select Groups</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-navigation-drawer v-model="left" fixed temporary color="#ECD632" />
+
+    <!-- ADD PAGES HERE -->
     <LoginBox />
-    <v-toolbar color="white">
-      <v-toolbar-title v-text="title"></v-toolbar-title>
-    </v-toolbar>
-    <v-content>
-      <section>
-        <v-parallax src="assets/hero.jpeg" height="600">
-          <v-layout column align-center justify-center class="white--text">
-            <!-- <img src="assets/vuetify.png" alt="Vuetify.js" height="200" /> TODO: LOGO HERE -->
-            <h1 class="white--text mb-2 display-1 text-center">Notes Extreme</h1>
-            <div class="subheading mb-4 text-center">Powered by *CompanyName*</div>
-            <v-btn
-              class="mt-12"
-              color="blue lighten-2"
-              dark
-              large
-              href="/pre-made-themes"
-            >Get Started</v-btn>
-          </v-layout>
-        </v-parallax>
-      </section>
+    <Notes />
 
-      <section>
-        <v-layout column wrap class="my-12" align-center>
-          <v-flex xs12 sm4 class="my-4">
-            <div class="text-center">
-              <h2 class="headline">The best way to start developing</h2>
-              <span class="subheading">Cras facilisis mi vitae nunc</span>
-            </div>
-          </v-flex>
-          <v-flex xs12>
-            <v-container grid-list-xl>
-              <v-layout row wrap align-center>
-                <v-flex xs12 md4>
-                  <v-card flat class="transparent">
-                    <v-card-text class="text-center">
-                      <v-icon x-large class="blue--text text--lighten-2">mdi-palette</v-icon>
-                    </v-card-text>
-                    <v-card-title primary-title class="layout justify-center">
-                      <div class="headline text-center">Material Design</div>
-                    </v-card-title>
-                    <v-card-text>
-                      Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare.
-                      Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                      Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti.
-                    </v-card-text>
-                  </v-card>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-card flat class="transparent">
-                    <v-card-text class="text-center">
-                      <v-icon x-large class="blue--text text--lighten-2">mdi-flash</v-icon>
-                    </v-card-text>
-                    <v-card-title primary-title class="layout justify-center">
-                      <div class="headline">Fast development</div>
-                    </v-card-title>
-                    <v-card-text>
-                      Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare.
-                      Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                      Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti.
-                    </v-card-text>
-                  </v-card>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-card flat class="transparent">
-                    <v-card-text class="text-center">
-                      <v-icon x-large class="blue--text text--lighten-2">mdi-wrench</v-icon>
-                    </v-card-text>
-                    <v-card-title primary-title class="layout justify-center">
-                      <div class="headline text-center">Completely Open Sourced</div>
-                    </v-card-title>
-                    <v-card-text>
-                      Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare.
-                      Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                      Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti.
-                    </v-card-text>
-                  </v-card>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-flex>
-        </v-layout>
-      </section>
-
-      <section>
-        <v-parallax src="assets/section.jpg" height="380">
-          <v-layout column align-center justify-center>
-            <div class="headline white--text mb-4 text-center">Web development has never been easier</div>
-            <em>Kick-start your application today</em>
-            <v-btn
-              class="mt-12"
-              color="blue lighten-2"
-              dark
-              large
-              href="/pre-made-themes"
-            >Get Started</v-btn>
-          </v-layout>
-        </v-parallax>
-      </section>
-
-      <section>
-        <v-container grid-list-xl>
-          <v-layout row wrap justify-center class="my-12">
-            <v-flex xs12 sm4>
-              <v-card flat class="transparent">
-                <v-card-title primary-title class="layout justify-center">
-                  <div class="headline">Company info</div>
-                </v-card-title>
-                <v-card-text>
-                  Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare.
-                  Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                  Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti.
-                </v-card-text>
-              </v-card>
-            </v-flex>
-            <v-flex xs12 sm4 offset-sm1>
-              <v-card flat class="transparent">
-                <v-card-title primary-title class="layout justify-center">
-                  <div class="headline">Contact us</div>
-                </v-card-title>
-                <v-card-text>Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare.</v-card-text>
-                <v-list class="transparent">
-                  <v-list-item>
-                    <v-list-item-action>
-                      <v-icon class="blue--text text--lighten-2">mdi-phone</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                      <v-list-item-title>777-867-5309</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-action>
-                      <v-icon class="blue--text text--lighten-2">mdi-map-marker</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                      <v-list-item-title>Chicago, US</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-action>
-                      <v-icon class="blue--text text--lighten-2">mdi-email</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                      <v-list-item-title>john@vuetifyjs.com</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </section>
-
-      <v-footer color="blue darken-2">
-        <v-layout row wrap align-center>
-          <v-flex xs12>
-            <div class="white--text ml-4">
-              Made with
-              <v-icon class="red--text">mdi-heart</v-icon>by
-              <a class="white--text" href="https://vuetifyjs.com" target="_blank">Vuetify</a>
-              and
-              <a class="white--text" href="https://github.com/vwxyzjn">Costa Huang</a>
-            </div>
-          </v-flex>
-        </v-layout>
-      </v-footer>
-    </v-content>
+    <!-- footer stuff -->
+    <v-footer app color="#9F684A" class="white--text">
+      <span>Duck Notes Inc.</span>
+      <v-spacer />
+      <span>&copy; 2020</span>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
+import Notes from "./components/Notes.vue";
 import LoginBox from "./components/LoginBox.vue";
 
 export default {
   name: "App",
 
-  components: { LoginBox },
+  components: { Notes, LoginBox },
 
   data: () => ({
     title: "Notes Extreme"
+  }),
+
+  props: {
+    source: String
+  },
+
+  data: () => ({
+    drawer: null,
+    drawerRight: null,
+    right: false,
+    left: false
   })
 };
 </script>
+
+<style scoped>
+.v-application {
+  background-color: #beb1a4;
+  color: black;
+}
+</style>
