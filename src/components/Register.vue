@@ -7,7 +7,7 @@
             <v-col cols="12" sm="8" md="4">
               <v-card class="elevation-12">
                 <v-toolbar color="#5AC161" dark flat>
-                  <v-toolbar-title class="black--text">Login</v-toolbar-title>
+                  <v-toolbar-title class="black--text">Register</v-toolbar-title>
                   <v-spacer />
                 </v-toolbar>
                 <v-card-text>
@@ -18,21 +18,25 @@
                       label="Username"
                       type="text"
                     />
-
                     <v-text-field
                       v-model="password"
                       prepend-icon="mdi-lock"
                       label="Password"
                       type="password"
                     />
+                    <v-text-field
+                      v-model="confirmpassword"
+                      prepend-icon="mdi-lock"
+                      label="Confirm Password"
+                      type="password"
+                    />
                   </v-form>
                 </v-card-text>
                 <v-card-actions>
-                  <v-btn color="#5AC161">Register</v-btn>
-                  <v-spacer />
                   <v-label class="red--text">{{ error }}</v-label>
                   <v-spacer />
-                  <v-btn color="#5AC161" @click="login">Login</v-btn>
+                  <!-- todo change responce to look nicer -->
+                  <v-btn color="#5AC161" @click="Register">Confirm</v-btn>
                 </v-card-actions>
               </v-card>
             </v-col>
@@ -53,23 +57,28 @@ export default {
   data: () => ({
     username: "",
     password: "",
+    confirmpassword: "",
     res: "",
     error: ""
   }),
   methods: {
-    login() {
+    Register() {
+      if(this.password == this.confirmpassword){
       let dataToSend = {
         username: this.username,
         password: this.password
       };
-      $.post(server + "/login", dataToSend, res => {
+      $.post(server + "/register", dataToSend, res => {
         this.res = JSON.stringify(res);
         if(res.success){
-
-        }else{
-          this.error = res.error;
+          }else{
+        this.error = "Username already exists"
         }
       });
+    }
+    else{
+      this.error = "Password Does not Match"
+    }
     }
   }
 };

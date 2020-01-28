@@ -6,7 +6,7 @@
         <v-row justify="center" align="center">
           <v-col class="shrink"></v-col>
           <!-- Notes to appear here -->
-          <h1>SOME NOTES</h1>
+          <img src="../assets/ducknotes.png" />
         </v-row>
       </v-container>
     </v-content>
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import App from "../App";
+
 export default {};
 </script>
 
