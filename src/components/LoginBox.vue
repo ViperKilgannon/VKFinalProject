@@ -20,6 +20,7 @@
                     />
 
                     <v-text-field
+                    @keydown.enter="login"
                       v-model="password"
                       prepend-icon="mdi-lock"
                       label="Password"
@@ -28,7 +29,7 @@
                   </v-form>
                 </v-card-text>
                 <v-card-actions>
-                  <v-btn color="#5AC161">Register</v-btn>
+                  <v-btn color="#5AC161" @click="$root.page='register'">Register</v-btn>
                   <v-spacer />
                   <v-label class="red--text">{{ error }}</v-label>
                   <v-spacer />
@@ -57,6 +58,17 @@ export default {
     error: ""
   }),
   methods: {
+          getGroups() {
+    let dataToSend = {
+        _id: this.$root.id
+      };
+    $.get(server + "/groups", dataToSend, res => {
+      if(res.success){
+      this.$root.groupList = res.groups;
+      }
+    })
+  },
+
     login() {
       let dataToSend = {
         username: this.username,
@@ -65,12 +77,16 @@ export default {
       $.post(server + "/login", dataToSend, res => {
         this.res = JSON.stringify(res);
         if(res.success){
-
+          this.$root.user = res.username;
+          this.$root.id = res._id;
+          this.$root.page='notes';
+          this.getGroups();
         }else{
           this.error = res.error;
         }
       });
     }
+
   }
 };
 </script>

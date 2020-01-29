@@ -26,7 +26,7 @@
                     />
                     <v-text-field
                       v-model="confirmpassword"
-                      prepend-icon="mdi-lock"
+                      prepend-icon="mdi-lock-alert"
                       label="Confirm Password"
                       type="password"
                     />
@@ -35,7 +35,6 @@
                 <v-card-actions>
                   <v-label class="red--text">{{ error }}</v-label>
                   <v-spacer />
-                  <!-- todo change responce to look nicer -->
                   <v-btn color="#5AC161" @click="Register">Confirm</v-btn>
                 </v-card-actions>
               </v-card>
@@ -71,6 +70,7 @@ export default {
       $.post(server + "/register", dataToSend, res => {
         this.res = JSON.stringify(res);
         if(res.success){
+          this.$root.page='login'
           }else{
         this.error = "Username already exists"
         }

@@ -3,12 +3,12 @@
     <!-- This is the nav bar code -->
     <v-app-bar app clipped-right color="#5AC161" dark>
       <v-app-bar-nav-icon class="black--text" @click="drawer = !drawer" />
+      <v-img src="./assets/ducknotes.png" max-height="42px" max-width="30px" @click="$root.page='notes'" class="mx-2" />
       <v-toolbar-title class="black--text">Duck Notes</v-toolbar-title>
       <v-spacer />
       <!-- todo dynamic lable to login, show user when logged in, have logout attached -->
-      <v-label >Login</v-label>
-      <!-- <v-label @click="logout()">{{username}}</v-label> -->
-      <img src="./assets/ducknotes.png" width="35px" height="55px" style="margin-left: 5px" />
+      <v-app-bar-nav-icon class="black--text mr-2" @click="$root.page='login'" v-if="!$root.user">Login</v-app-bar-nav-icon>
+      <v-app-bar-nav-icon class="black--text mr-2" @click="logout" v-if="$root.user">Logout</v-app-bar-nav-icon>
     </v-app-bar>
 
     <!-- This is the Menu Drawer to have list of notes -->
@@ -23,7 +23,7 @@
           <v-list-item-title>Create New</v-list-item-title>
         </v-list-item>
         <v-list-item-action></v-list-item-action>
-        <v-list-item v-for="item in item" :key="item.title">
+        <v-list-item v-for="item in $root.noteList" :key="item.title">
           <v-list-item-content>
             <v-list-item-title><v-icon>mdi-note-outline</v-icon>{{item.title}}</v-list-item-title>
           </v-list-item-content>
@@ -38,23 +38,27 @@
           <v-icon>mdi-page-previous-outline</v-icon>
           <v-list-item-title>Back To Notes</v-list-item-title>
         </v-list-item>
-          <v-list-item @click="createGroup()">
+
+          <v-list-item @click="createGroup">
           <v-icon>mdi-plus-box-multiple-outline</v-icon>
           <v-list-item-title>New Group</v-list-item-title>
           </v-list-item>
+        
           <v-list-item-action></v-list-item-action>
-        <v-list-item v-for="item in item2" :key="item.title">
+        <!-- todo add select function for groups -->
+        <v-list-item v-for="item in $root.groupList" :key="item.text" @click="removeGroup">
           <v-list-item-content>
-            <v-list-item-title><v-icon>mdi-note-multiple-outline</v-icon>{{item.title}}</v-list-item-title>
+            <v-list-item-title><v-icon>mdi-note-multiple-outline</v-icon>{{item.text}}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+
       </v-list>
     </v-navigation-drawer>
 
     <!-- ADD PAGES HERE -->
-    <Register />
-    <LoginBox />
-    <Notes />
+    <Register v-if="$root.page=='register'" />
+    <LoginBox v-if="$root.page=='login'" />
+    <Notes v-if="$root.page=='notes'" />
 
     <!-- footer stuff -->
     <v-footer app color="#9F684A" class="white--text">
@@ -78,26 +82,19 @@ export default {
   name: "App",
 
   components: { Notes, LoginBox, Register },
+  
 
   data: () => ({
     title: "Notes Extreme",
     drawer: false,
-    item: [{title: "notes here"}],
-    item2: [{title: "groups here"}],
-    left: false,
-    right: false
+    left: false
   }),
 
 methods:{
   logout(){
-    return 0
-    // req ()
-    // res ()
-  },
-  getGroups() {
-    return 1
-    // req ()
-    // res (groups[])
+    this.$root.user = "";
+    this.$root.id = "";
+    this.$root.groupList = [];
   },
   getNotes(){
     return 1
