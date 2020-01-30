@@ -58,16 +58,7 @@ export default {
     error: ""
   }),
   methods: {
-          getGroups() {
-    let dataToSend = {
-        _id: this.$root.id
-      };
-    $.get(server + "/groups", dataToSend, res => {
-      if(res.success){
-      this.$root.groupList = res.groups;
-      }
-    })
-  },
+          
 
     login() {
       let dataToSend = {
@@ -80,7 +71,7 @@ export default {
           this.$root.user = res.username;
           this.$root.id = res._id;
           this.$root.page='notes';
-          this.getGroups();
+          // this.getGroups();
         }else{
           this.error = res.error;
         }
