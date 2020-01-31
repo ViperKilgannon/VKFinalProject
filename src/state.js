@@ -1,8 +1,8 @@
 export default {
-    page: "notes",
-    user: "",
-    id: "",
-    noteList: [],
-    groupList: [],
-    currentGroup: ""
-}
+  user: "",
+  id: "",
+  noteList: [],
+  groupList: [],
+  currentGroup: "",
+  currentNote: ""
+};
