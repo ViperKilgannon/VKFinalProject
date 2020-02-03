@@ -13,8 +13,8 @@
       />
       <v-toolbar-title class="black--text">Duck Notes</v-toolbar-title>
       <v-spacer />
-      <v-app-bar-nav-icon class="black--text mr-2" @click="loginBox=true" v-if="!$root.user">Login</v-app-bar-nav-icon>
-      <v-app-bar-nav-icon class="black--text mr-2" @click="logout" v-if="$root.user">Logout</v-app-bar-nav-icon>
+      <v-app-bar-nav-icon class="black--text mr-4" @click="loginBox=true" v-if="!$root.user">Login</v-app-bar-nav-icon>
+      <v-app-bar-nav-icon class="black--text mr-4" @click="logout" v-if="$root.user">Logout</v-app-bar-nav-icon>
     </v-app-bar>
 
     <!-- This is the Menu Drawer to have list of notes -->
@@ -24,7 +24,7 @@
           <v-icon class="mr-5">mdi-page-next-outline</v-icon>
           <v-list-item-title>Select Group</v-list-item-title>
         </v-list-item>
-        <v-list-item @click="createNotes()">
+        <v-list-item @click="$root.currentNote = ''; $root.currentNoteText = ''; drawer = false">
           <v-icon class="mr-5">mdi-pencil-plus-outline</v-icon>
           <v-list-item-title>Create New</v-list-item-title>
         </v-list-item>
@@ -32,7 +32,7 @@
         <v-list-item
           v-for="item in $root.noteList"
           :key="item.text"
-          @click="$root.currentNote = item._id;"
+          @click="$root.currentNote = item._id; $root.currentNoteText = item.text"
         >
           <v-list-item-content>
             <v-list-item-title>
@@ -63,7 +63,7 @@
 
         <v-list-item-action></v-list-item-action>
 
-        <v-list-item @click="$root.currentGroup = ''; getNotes();">
+        <v-list-item @click="$root.currentGroup = ''; $root.currentGroupName=''; getNotes();">
           <v-list-item-title v-if="$root.user">
             <v-icon class="mr-5">mdi-note-multiple-outline</v-icon>All
           </v-list-item-title>
@@ -71,7 +71,7 @@
         <v-list-item
           v-for="item in $root.groupList"
           :key="item.text"
-          @click="$root.currentGroup = item._id; getNotes();"
+          @click="$root.currentGroup = item._id; $root.currentGroupName=item.text; getNotes();"
         >
           <v-list-item-content>
             <v-list-item-title>
@@ -169,8 +169,8 @@
             </v-row>
           </v-container>
         </v-card-text>
+        <v-card-subtitle class="error--text ml-5">{{ error }}</v-card-subtitle>
         <v-card-actions>
-          <v-card-subtitle class="error--text ml-5">{{ error }}</v-card-subtitle>
           <v-spacer></v-spacer>
           <v-btn color="#5AC161" text @click="registerBox = false">Close</v-btn>
           <v-btn color="#5AC161" text @click="register(); registerBox = false">Confirm</v-btn>
@@ -211,8 +211,8 @@
             </v-row>
           </v-container>
         </v-card-text>
+        <v-card-subtitle class="error--text ml-5">{{ error }}</v-card-subtitle>
         <v-card-actions>
-          <v-card-subtitle class="error--text ml-5">{{ error }}</v-card-subtitle>
           <v-spacer></v-spacer>
           <v-btn color="#5AC161" text @click="loginBox = false; registerBox = true">Register</v-btn>
           <v-btn color="#5AC161" text @click="loginBox = false">Close</v-btn>
@@ -223,16 +223,43 @@
 
     <!-- Notes focus here -->
     <v-content>
-      <v-container>
-        <v-textarea
-          name="input-7-1"
-          background-color="white"
-          filled
-          label="Label"
-          auto-grow
-          value="something"
-        ></v-textarea>
-      </v-container>
+      <v-card max-width="1200px" height="80%" class="mx-auto mt-12" v-if="$root.user">
+        <v-container class="mx-5">
+          <v-text-field
+            v-if="$root.currentGroup"
+            v-model="$root.currentGroupName"
+            label="Group"
+            type="text"
+            background-color="light-grey"
+          ></v-text-field>
+        </v-container>
+        <v-container v-if="!$root.currentNote">
+          <v-textarea
+            height="fill"
+            name="notesCreator"
+            background-color="white"
+            filled
+            label="note"
+            v-model="newNoteText"
+            :no-resize="true"
+            rows="12"
+          ></v-textarea>
+        </v-container>
+        <v-container v-if="$root.currentNote">
+          <v-textarea
+            name="notesEditor"
+            background-color="white"
+            height="fill"
+            filled
+            label="note"
+            v-model="$root.currentNoteText"
+            :no-resize="true"
+            rows="12"
+          ></v-textarea>
+        </v-container>
+        <v-btn class="float-right mr-5" v-if="$root.currentNote" @click="updateNote()">Update</v-btn>
+        <v-btn class="float-right mr-5" v-if="!$root.currentNote" @click="createNote()">Create New</v-btn>
+      </v-card>
     </v-content>
 
     <!-- footer stuff -->
@@ -265,6 +292,7 @@ export default {
     confirmDelete: false,
     newGroupBox: false,
     newGroupName: "",
+    newNoteText: "",
     username: "",
     password: "",
     res: "",
@@ -282,13 +310,20 @@ export default {
       $.post(server + "/login", dataToSend, res => {
         this.res = JSON.stringify(res);
         if (res.success) {
-          this.loginSuccessful(res.username);
+          this.loginSuccessful(res);
         } else {
           this.error = res.error;
+          this.$root.user = "";
+          this.$root.id = "";
+          this.$root.groupList = [];
+          this.$root.noteList = [];
+          this.$root.currentGroup = "";
+          this.$root.currentNote = "";
+          this.$root.currentNoteText = "";
         }
       });
     },
-    Register() {
+    register() {
       if (this.password == this.confirmpassword) {
         let dataToSend = {
           username: this.username,
@@ -306,9 +341,9 @@ export default {
         this.error = "Password Does not Match";
       }
     },
-    loginSuccessful(username) {
-      this.$root.user = username;
-      this.$root.id = "";
+    loginSuccessful(res) {
+      this.$root.user = res.username;
+      this.$root.id = res._id;
       this.$root.page = "notes";
       this.loginBox = false;
     },
@@ -320,6 +355,8 @@ export default {
           this.$root.groupList = [];
           this.$root.noteList = [];
           this.$root.currentGroup = "";
+          this.$root.currentNote = "";
+          this.$root.currentNoteText = "";
         } else {
           alert(res.error);
         }
@@ -352,15 +389,27 @@ export default {
       $.post(server + "/groups/create", dataToSend, res => {
         if (res.success) {
           this.$root.groupList = res.groups;
+          this.$root.currentGroup = "";
+          this.$root.currentGroupName = "";
+          this.$root.currentNote = "";
+          this.$root.currentNoteText = "";
         } else {
           alert(res.error);
         }
       });
     },
-    createNotes() {
-      return 1;
-      // req (text, ?groupId)
-      // res (notes[])
+    createNote() {
+      let dataToSend = {
+        groupId: this.$root.currentGroup,
+        text: this.newNoteText
+      };
+      $.post(server + "/notes/create", dataToSend, res => {
+        if (res.success) {
+          this.$root.noteList = res.notes;
+        } else {
+          alert(res.error);
+        }
+      });
     },
     removeGroup() {
       this.confirmDelete = true;
@@ -372,7 +421,9 @@ export default {
       };
       $.post(server + "/groups/remove", dataToSend, res => {
         if (res.success) {
-          console.log("Remove Successful");
+          this.$root.currentGroup = "";
+          this.$root.currentNote = "";
+          this.$root.currentNoteText = "";
         } else {
           alert(res.error);
         }
@@ -389,7 +440,41 @@ export default {
       };
       $.post(server + "/notes/remove", dataToSend, res => {
         if (res.success) {
-          console.log("Remove Successful");
+          this.$root.currentGroup = "";
+          this.$root.currentNote = "";
+          this.$root.currentNoteText = "";
+          this.$root.noteList = res.notes;
+        } else {
+          alert(res.error);
+        }
+      });
+    },
+    updateGroup() {
+      let dataToSend = {
+        groupId: this.$root.currentGroup,
+        text: this.$root.currentGroupName
+      };
+      $.post(server + "/groups/update", dataToSend, res => {
+        if (res.success) {
+          this.$root.currentGroup = "";
+          this.$root.groupList = res.groups;
+        } else {
+          alert(res.error);
+        }
+      });
+    },
+    updateNote() {
+      let dataToSend = {
+        noteId: this.$root.currentNote,
+        text: this.$root.currentNoteText
+      };
+      $.post(server + "/notes/update", dataToSend, res => {
+        if (res.success) {
+          if (this.$root.currentGroup) {
+            this.updateGroup();
+          }
+          this.$root.currentNote = "";
+          this.$root.currentNoteText = "";
           this.$root.noteList = res.notes;
         } else {
           alert(res.error);
@@ -401,8 +486,6 @@ export default {
     $.post(server + "/checkLogin", res => {
       if (res.success) {
         this.loginSuccessful(res.username);
-      } else {
-        alert(res.error);
       }
     });
   },

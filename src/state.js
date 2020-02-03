@@ -4,5 +4,7 @@ export default {
   noteList: [],
   groupList: [],
   currentGroup: "",
-  currentNote: ""
+  currentGroupName: "",
+  currentNote: "",
+  currentNoteTest: ""
 };
