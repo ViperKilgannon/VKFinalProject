@@ -6,5 +6,5 @@ export default {
   currentGroup: "",
   currentGroupName: "",
   currentNote: "",
-  currentNoteTest: ""
+  currentNoteText: ""
 };

@@ -24,7 +24,7 @@
           <v-icon class="mr-5">mdi-page-next-outline</v-icon>
           <v-list-item-title>Select Group</v-list-item-title>
         </v-list-item>
-        <v-list-item @click="$root.currentNote = ''; $root.currentNoteText = ''; drawer = false">
+        <v-list-item @click="$root.currentNote = ''; clearCurrentNoteBox(); drawer = false">
           <v-icon class="mr-5">mdi-pencil-plus-outline</v-icon>
           <v-list-item-title>Create New</v-list-item-title>
         </v-list-item>
@@ -38,12 +38,13 @@
             <v-list-item-title>
               <v-icon class="mr-5">mdi-note-outline</v-icon>
               {{item.text}}
-              <v-icon
-                class="float-right"
-                @click="$root.currentNote = item._id; deleteGroup = false; removeNotes()"
-              >mdi-close-circle</v-icon>
             </v-list-item-title>
           </v-list-item-content>
+          <v-list-item-icon
+            @click="$root.currentNote = item._id; deleteGroup = false; removeNotes()"
+          >
+            <v-icon>mdi-close-circle</v-icon>
+          </v-list-item-icon>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -63,8 +64,11 @@
 
         <v-list-item-action></v-list-item-action>
 
-        <v-list-item @click="$root.currentGroup = ''; $root.currentGroupName=''; getNotes();">
-          <v-list-item-title v-if="$root.user">
+        <v-list-item
+          v-if="$root.user"
+          @click="$root.currentGroup = ''; $root.currentGroupName=''; getNotes();"
+        >
+          <v-list-item-title>
             <v-icon class="mr-5">mdi-note-multiple-outline</v-icon>All
           </v-list-item-title>
         </v-list-item>
@@ -221,16 +225,25 @@
       </v-card>
     </v-dialog>
 
-    <!-- Notes focus here -->
-    <v-content>
-      <v-card max-width="1200px" height="80%" class="mx-auto mt-12" v-if="$root.user">
+    <!-- logged out main -->
+    <v-content v-if="!$root.user">
+      <v-container class="fill-height" fluid>
+        <v-row justify="center" align="center">
+          <v-col class="shrink"></v-col>
+          <img src="./assets/ducknotes.png" />
+        </v-row>
+      </v-container>
+
+      <!-- logged in main / notes focus -->
+    </v-content>
+    <v-content v-if="$root.user">
+      <v-card max-width="1200px" height="85%" class="mx-auto mt-12">
         <v-container class="mx-5">
           <v-text-field
             v-if="$root.currentGroup"
             v-model="$root.currentGroupName"
-            label="Group"
+            label="Current Group/Update Group Name"
             type="text"
-            background-color="light-grey"
           ></v-text-field>
         </v-container>
         <v-container v-if="!$root.currentNote">
@@ -239,10 +252,10 @@
             name="notesCreator"
             background-color="white"
             filled
-            label="note"
+            label="New Note"
             v-model="newNoteText"
             :no-resize="true"
-            rows="12"
+            rows="13"
           ></v-textarea>
         </v-container>
         <v-container v-if="$root.currentNote">
@@ -251,14 +264,18 @@
             background-color="white"
             height="fill"
             filled
-            label="note"
+            label="Update Note"
             v-model="$root.currentNoteText"
             :no-resize="true"
-            rows="12"
+            rows="13"
           ></v-textarea>
         </v-container>
-        <v-btn class="float-right mr-5" v-if="$root.currentNote" @click="updateNote()">Update</v-btn>
-        <v-btn class="float-right mr-5" v-if="!$root.currentNote" @click="createNote()">Create New</v-btn>
+        <v-btn class="float-right mr-5 mb-5" v-if="$root.currentNote" @click="updateNote()">Update</v-btn>
+        <v-btn
+          class="float-right mr-5 mb-5"
+          v-if="!$root.currentNote"
+          @click="createNote()"
+        >Create New</v-btn>
       </v-card>
     </v-content>
 
@@ -291,6 +308,7 @@ export default {
     registerBox: false,
     confirmDelete: false,
     newGroupBox: false,
+    cardContent: true,
     newGroupName: "",
     newNoteText: "",
     username: "",
@@ -302,6 +320,10 @@ export default {
   }),
 
   methods: {
+    clearCurrentNoteBox() {
+      this.$root.currentNoteText = "";
+      this.newNoteText = "";
+    },
     login() {
       let dataToSend = {
         username: this.username,
@@ -318,6 +340,7 @@ export default {
           this.$root.groupList = [];
           this.$root.noteList = [];
           this.$root.currentGroup = "";
+          this.$root.currentGroupName = "";
           this.$root.currentNote = "";
           this.$root.currentNoteText = "";
         }
@@ -344,7 +367,6 @@ export default {
     loginSuccessful(res) {
       this.$root.user = res.username;
       this.$root.id = res._id;
-      this.$root.page = "notes";
       this.loginBox = false;
     },
     logout() {
@@ -355,6 +377,7 @@ export default {
           this.$root.groupList = [];
           this.$root.noteList = [];
           this.$root.currentGroup = "";
+          this.$root.currentGroupName = "";
           this.$root.currentNote = "";
           this.$root.currentNoteText = "";
         } else {
@@ -406,6 +429,8 @@ export default {
       $.post(server + "/notes/create", dataToSend, res => {
         if (res.success) {
           this.$root.noteList = res.notes;
+          this.$root.currentNote = res.insertedId;
+          this.$root.currentNoteText = this.newNoteText;
         } else {
           alert(res.error);
         }
@@ -485,7 +510,16 @@ export default {
   mounted() {
     $.post(server + "/checkLogin", res => {
       if (res.success) {
-        this.loginSuccessful(res.username);
+        this.loginSuccessful(res);
+      } else {
+        this.$root.user = "";
+        this.$root.id = "";
+        this.$root.groupList = [];
+        this.$root.noteList = [];
+        this.$root.currentGroup = "";
+        this.$root.currentGroupName = "";
+        this.$root.currentNote = "";
+        this.$root.currentNoteText = "";
       }
     });
   },
@@ -496,7 +530,8 @@ export default {
 </script>
 
 <style scoped>
-.v-app {
+body {
   background-color: #beb1a4;
+  background-image: "./assets/ducknotes.png";
 }
 </style>
