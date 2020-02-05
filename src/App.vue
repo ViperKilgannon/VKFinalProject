@@ -237,7 +237,7 @@
       <!-- logged in main / notes focus -->
     </v-content>
     <v-content v-if="$root.user">
-      <v-card max-width="1200px" height="85%" class="mx-auto mt-12">
+      <v-card max-width="1200px" height="85%" class="mx-auto mt-12 pb-12" background-color="white">
         <v-container class="mx-5">
           <v-text-field
             v-if="$root.currentGroup"
@@ -250,32 +250,32 @@
           <v-textarea
             height="fill"
             name="notesCreator"
-            background-color="white"
             filled
             label="New Note"
             v-model="newNoteText"
             :no-resize="true"
-            rows="13"
+            rows="12"
           ></v-textarea>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn @click="createNote()">Create New</v-btn>
+          </v-card-actions>
         </v-container>
         <v-container v-if="$root.currentNote">
           <v-textarea
             name="notesEditor"
-            background-color="white"
             height="fill"
             filled
             label="Update Note"
             v-model="$root.currentNoteText"
             :no-resize="true"
-            rows="13"
+            rows="12"
           ></v-textarea>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn click="updateNote()">Update</v-btn>
+          </v-card-actions>
         </v-container>
-        <v-btn class="float-right mr-5 mb-5" v-if="$root.currentNote" @click="updateNote()">Update</v-btn>
-        <v-btn
-          class="float-right mr-5 mb-5"
-          v-if="!$root.currentNote"
-          @click="createNote()"
-        >Create New</v-btn>
       </v-card>
     </v-content>
 
@@ -530,8 +530,4 @@ export default {
 </script>
 
 <style scoped>
-body {
-  background-color: #beb1a4;
-  background-image: "./assets/ducknotes.png";
-}
 </style>
