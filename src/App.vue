@@ -164,6 +164,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="confirmpassword"
+                  bounce
                   prepend-icon="mdi-lock-alert"
                   label="Confirm Password"
                   type="password"
@@ -230,7 +231,7 @@
       <v-container class="fill-height" fluid>
         <v-row justify="center" align="center">
           <v-col class="shrink"></v-col>
-          <img src="./assets/ducknotes.png" />
+          <img src="./assets/ducknotes.png" class="m-auto" />
         </v-row>
       </v-container>
 
@@ -273,7 +274,7 @@
           ></v-textarea>
           <v-card-actions>
             <v-spacer />
-            <v-btn click="updateNote()">Update</v-btn>
+            <v-btn @click="updateNote()">Update</v-btn>
           </v-card-actions>
         </v-container>
       </v-card>
@@ -283,7 +284,7 @@
     <v-footer app color="#9F684A" class="white--text">
       <span>Duck Notes Inc.</span>
       <v-spacer />
-      <span>&copy; 2020</span>
+      <span class="mr-6">&copy; 2020</span>
     </v-footer>
   </v-app>
 </template>
@@ -431,6 +432,7 @@ export default {
           this.$root.noteList = res.notes;
           this.$root.currentNote = res.insertedId;
           this.$root.currentNoteText = this.newNoteText;
+          this.newNoteText = "";
         } else {
           alert(res.error);
         }
@@ -483,6 +485,7 @@ export default {
         if (res.success) {
           this.$root.currentGroup = "";
           this.$root.groupList = res.groups;
+          console.log(res);
         } else {
           alert(res.error);
         }
@@ -501,6 +504,7 @@ export default {
           this.$root.currentNote = "";
           this.$root.currentNoteText = "";
           this.$root.noteList = res.notes;
+          console.log(res);
         } else {
           alert(res.error);
         }
