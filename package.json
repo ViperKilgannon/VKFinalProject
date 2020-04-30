@@ -10,7 +10,7 @@
   "dependencies": {
     "bootstrap-vue": "^2.2.2",
     "core-js": "^3.4.4",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "register-service-worker": "^1.6.2",
     "startbootstrap-stylish-portfolio": "^5.0.7",
     "vue": "^2.6.10",
